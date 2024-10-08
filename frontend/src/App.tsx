@@ -7,6 +7,9 @@ import { Publish } from "./pages/Publish"
 import { Landing } from "./pages/Landing"
 import { Bookmark } from "./pages/Bookmark"
 import { Myblogs } from "./pages/Myblogs"
+import ForgetPassword from "./pages/ForgetPassword"
+import Verify from "./pages/Verify"
+import NewPassword from "./pages/NewPassword"
 
 
 function App() {
@@ -22,6 +25,10 @@ function App() {
     <Route path="/blogs"   element={<Blogs/>} />
     <Route path="/publish"   element={<Publish/>} />
     <Route path="/myblogs"   element={<Myblogs/>} />
+    <Route path="/forgotpassword"   element={<ForgetPassword/>} />
+    <Route path="/verify"   element={<Verify/>} />
+    <Route path="/resetpassword"   element={<NewPassword/>} />
+    
    </Routes>
    </BrowserRouter>
    </>

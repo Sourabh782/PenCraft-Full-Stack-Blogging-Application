@@ -3,7 +3,7 @@ import { Link, useNavigate  } from "react-router-dom"
 import { SignupType } from "@akshitlakhera/common-zod-app"; 
 import axios from "axios";
 import { BACKEND_URL } from "@/config";
-const Auth = ({type} : { type:"signin"|"signup"}) => {
+const Auth = ({type} : { type:"signin"|"signup"|"forgot"}) => {
   const navigate = useNavigate();
   const [postInputs,setPostInputs] = useState<SignupType>({
     email:"",
@@ -11,17 +11,23 @@ const Auth = ({type} : { type:"signin"|"signup"}) => {
     name:"",
   });
   async function sendRequest() {
-    try {  const response=  await axios.post(`${BACKEND_URL}/api/v1/user/${type==="signup" ? "signup" :"signin"}`,postInputs)
-    // Sometimes this jwt format can give you lot of pain haha
-    const jwt = "Bearer "+response.data.token
-    const userName = response.data.name; // Access user's name from response data
-    localStorage.setItem("token",jwt);
-    localStorage.setItem("name",userName)
-    console.log(userName)
-    console.log(jwt)
-    navigate("/blogs") }
+    try {  
+      if(type === "forgot"){
+        navigate("/verify")
+      } else {
+        const response=  await axios.post(`${BACKEND_URL}/api/v1/user/${type==="signup" ? "signup" :"signin"}`,postInputs)
+        // Sometimes this jwt format can give you lot of pain haha
+        const jwt = "Bearer "+response.data.token
+        const userName = response.data.name; // Access user's name from response data
+        localStorage.setItem("token",jwt);
+        localStorage.setItem("name",userName)
+        console.log(userName)
+        console.log(jwt)
+        navigate("/blogs") 
+      }
+    }
     catch(e) {
-      alert("Erro on sending request")
+      alert("Error on sending request")
     }
  
   }
@@ -30,11 +36,14 @@ const Auth = ({type} : { type:"signin"|"signup"}) => {
       <div className="flex justify-center ">
         <div>
         <div className="max-w-lg text-4xl font-bold px-10 text-center">
-        {type=== "signin"  ? "Sign In" :"Create an Account"}
+          {type=== "signin"  ? "Sign In" : type === "forgot" ? "Reset Password" : "Create an Account"}
           <div className="text-gray-500 font-medium text-lg mt-1">
-          {type==="signin"? "Don't have account" : "Already have account ?"}
-           
-            <Link className="ml-2 underline"to={type === "signin" ? "/signup" : "/signin"}>  {type === "signin" ? "Sign up" : "Sign in"}</Link>
+            {type==="signin"? "Don't have account" : type === "forgot" ? "Exter details to reset password" : "Already have account ?"}
+
+            { 
+              type !== "forgot" && 
+              <Link className="ml-2 underline" to={type === "signin" ? "/signup" : "/signin"}>  {type === "signin" ? "Sign up" : "Sign in"}</Link>
+            }
           </div>
           
           </div>
@@ -52,12 +61,21 @@ const Auth = ({type} : { type:"signin"|"signup"}) => {
                 ...postInputs, email:e.target.value
               })
             }}/>
-            <InputBox label="Password" placeholder="Enter your password" type="password"  onChange={(e) => { 
-              setPostInputs({
-                ...postInputs, password:e.target.value
-              })
-            }}/>
-            <button onClick={sendRequest} type="button" className="w-full mt-4 text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-xl text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">{type === "signup" ? "Sign up" : "Sign in"}</button>
+            {
+              type !== "forgot" &&
+              <InputBox label="Password" placeholder="Enter your password" type="password"  onChange={(e) => { 
+                setPostInputs({
+                  ...postInputs, password:e.target.value
+                })
+              }}/>
+            }
+            {
+              type === "signin" && 
+              <Link to="/forgotpassword" className="m4-2 cursor-pointer hover:text-blue-600">Forgot passowrd?</Link>
+            }
+            <button onClick={sendRequest} type="button" className="w-full mt-4 text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-xl text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">
+              {type === "signup" ? "Sign up" : type === "forgot" ? "Send Otp" : "Sign in"}
+            </button>
 
         </div>
         </div>
